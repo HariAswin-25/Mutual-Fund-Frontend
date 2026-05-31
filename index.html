@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mutual Fund Transaction Dashboard</title>
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- Stylesheet -->
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <!-- ── Loading Overlay ───────────────────────────────────────────── -->
+  <div id="loadingOverlay" class="loading-overlay">
+    <div class="spinner"></div>
+    <div class="loading-text">Fetching transaction records...</div>
+  </div>
+
+  <!-- ── Toast Notification ────────────────────────────────────────── -->
+  <div id="toast" class="toast">
+    <span class="toast-icon">📊</span>
+    <span class="toast-msg">Loading dashboard data...</span>
+  </div>
+
+  <!-- ── Navbar ────────────────────────────────────────────────────── -->
+  <nav class="navbar">
+    <div class="navbar-brand">
+      <div class="navbar-logo">📈</div>
+      <div>
+        <h1 class="navbar-title">WealthSync</h1>
+        <p class="navbar-subtitle">Mutual Fund Transaction Summary</p>
+      </div>
+    </div>
+    <div class="navbar-status">
+      <span class="status-dot"></span>
+      <span>Live DB Feed</span>
+    </div>
+  </nav>
+
+  <!-- ── Main Layout Container ──────────────────────────────────────── -->
+  <main class="main-container">
+
+    <!-- ── Date-range Filter Bar ──────────────────────────────────────── -->
+    <section class="filter-bar">
+      <div class="filter-label">Filter Transactions</div>
+      
+      <div class="filter-group">
+        <label for="startDate">From:</label>
+        <input type="date" id="startDate" class="date-input" value="2025-05-27">
+      </div>
+
+      <div class="filter-group">
+        <label for="endDate">To:</label>
+        <input type="date" id="endDate" class="date-input" value="2025-05-27">
+      </div>
+
+      <button id="applyFilter" class="btn btn-primary">Apply Filter</button>
+      <button id="resetFilter" class="btn btn-secondary">Reset</button>
+    </section>
+
+    <!-- ── KPI Cards Strip ───────────────────────────────────────────── -->
+    <section class="kpi-strip">
+      <div class="kpi-card">
+        <div class="kpi-icon">💰</div>
+        <div class="kpi-value teal" id="kpiTotalAmount">₹0.00</div>
+        <div class="kpi-label">Total Amount Invested</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-icon">📊</div>
+        <div class="kpi-value blue" id="kpiTotalUnits">0.0000</div>
+        <div class="kpi-label">Total NAV Units</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-icon">🏛️</div>
+        <div class="kpi-value purple" id="kpiTotalFunds">0</div>
+        <div class="kpi-label">Mutual Funds Active</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-icon">👥</div>
+        <div class="kpi-value gold" id="kpiTotalInvestors">0</div>
+        <div class="kpi-label">Total Investors</div>
+      </div>
+    </section>
+
+    <!-- ── Navigation Tabs ───────────────────────────────────────────── -->
+    <nav class="tab-nav">
+      <button class="tab-btn active" data-tab="tab1">👤 Investor Summary per Fund</button>
+      <button class="tab-btn" data-tab="tab2">🏛️ Fund-wise Drilldown</button>
+      <button class="tab-btn" data-tab="tab3">📋 Investor Ledger</button>
+      <button class="tab-btn" data-tab="tab4">⭐ Mutual Fund Summaries</button>
+    </nav>
+
+    <!-- ═══════════════════════════════════════════════════════════════════ -->
+    <!-- TAB 1: Investor-wise Purchase Summary per Mutual Fund               -->
+    <!-- ═══════════════════════════════════════════════════════════════════ -->
+    <section id="tab1" class="tab-panel active">
+      <div class="dashboard-grid">
+        <div class="card">
+          <div class="card-header">
+            <h2 class="card-title">Investor-wise Purchases <span class="card-badge" id="tab1Badge">0</span></h2>
+          </div>
+          <div class="card-body no-pad">
+            <div class="table-wrapper" id="tab1TableWrap">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>#</th>
+                    <th>Investor Name</th>
+                    <th>PAN</th>
+                    <th>Mutual Fund</th>
+                    <th>Scheme Type</th>
+                    <th>Amount (₹)</th>
+                    <th>Units</th>
+                    <th>Txns</th>
+                  </tr>
+                </thead>
+                <tbody id="tab1TableBody">
+                  <!-- Injected by app.js -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <h2 class="card-title">Top Purchases by Amount</h2>
+          </div>
+          <div class="card-body">
+            <div class="chart-container">
+              <canvas id="tab1Chart"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════════════════ -->
+    <!-- TAB 2: Mutual Fund-wise Summary per Investor                         -->
+    <!-- ═══════════════════════════════════════════════════════════════════ -->
+    <section id="tab2" class="tab-panel">
+      <div class="dashboard-grid">
+        <div class="card">
+          <div class="card-header">
+            <h2 class="card-title">Scheme Drilldown <span class="card-badge" id="tab2Badge">0</span></h2>
+          </div>
+          <div class="card-body no-pad">
+            <div class="table-wrapper" style="max-height: 480px;">
+              <div id="tab2Accordion">
+                <!-- Accordion lists injected by app.js -->
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <h2 class="card-title">Asset Allocation by Fund</h2>
+          </div>
+          <div class="card-body">
+            <div class="chart-container">
+              <canvas id="tab2Chart"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════════════════ -->
+    <!-- TAB 3: Investor List with Purchase Details                         -->
+    <!-- ═══════════════════════════════════════════════════════════════════ -->
+    <section id="tab3" class="tab-panel">
+      <div class="dashboard-grid">
+        <div class="card">
+          <div class="card-header">
+            <h2 class="card-title">Investor Ledger <span class="card-badge" id="tab3Badge">0</span></h2>
+          </div>
+          <div class="card-body no-pad">
+            <div class="table-wrapper" id="tab3TableWrap">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>#</th>
+                    <th>Investor Name</th>
+                    <th>PAN</th>
+                    <th>Total Invested</th>
+                    <th>Total Units</th>
+                    <th>Funds Owned</th>
+                    <th>Txns</th>
+                  </tr>
+                </thead>
+                <tbody id="tab3TableBody">
+                  <!-- Injected by app.js -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <h2 class="card-title">Investor Rankings by Capital</h2>
+          </div>
+          <div class="card-body">
+            <div class="chart-container">
+              <canvas id="tab3Chart"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════════════════ -->
+    <!-- TAB 4: Mutual Fund Summary                                         -->
+    <!-- ═══════════════════════════════════════════════════════════════════ -->
+    <section id="tab4" class="tab-panel">
+      <div class="dashboard-grid full" style="margin-bottom: 1.5rem;">
+        <div class="card">
+          <div class="card-header">
+            <h2 class="card-title">Mutual Fund Scheme Summaries <span class="card-badge" id="tab4Badge">0</span></h2>
+            <div class="accordion-meta">
+              <span>Grand Total: <span class="highlight" id="tab4GrandTotal">₹0.00</span></span>
+              <span>Grand Units: <span class="highlight" id="tab4GrandUnits">0.0000</span></span>
+            </div>
+          </div>
+          <div class="card-body no-pad">
+            <div class="table-wrapper" id="tab4TableWrap">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>#</th>
+                    <th>Scheme Name</th>
+                    <th>Type</th>
+                    <th>Total Capital (₹)</th>
+                    <th>Total NAV Units</th>
+                    <th>Avg NAV Price</th>
+                    <th>Investors</th>
+                    <th>Txns</th>
+                  </tr>
+                </thead>
+                <tbody id="tab4TableBody">
+                  <!-- Injected by app.js -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="dashboard-grid">
+        <div class="card">
+          <div class="card-header">
+            <h2 class="card-title">Capital Invested per Fund</h2>
+          </div>
+          <div class="card-body">
+            <div class="chart-container">
+              <canvas id="tab4ChartAmount"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <h2 class="card-title">Units Purchased per Fund</h2>
+          </div>
+          <div class="card-body">
+            <div class="chart-container">
+              <canvas id="tab4ChartUnits"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="footer">
+    <p>&copy; 2026 WealthSync Dashboards. All rights reserved.</p>
+  </footer>
+
+  <!-- Script Modules -->
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>
