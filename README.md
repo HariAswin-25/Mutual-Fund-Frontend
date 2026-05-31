@@ -55,3 +55,20 @@ Because the frontend uses native Javascript ES modules (`import`/`export`), web 
 2. **Initial Load**: The filters are pre-filled with **May 27, 2025** (the date on which the dataset's transactions took place). Click **Apply Filter** to populate the cards and tables.
 3. **Explore Data**: Click on tabs at the top to toggle views. Hover over charts to see exact numbers, currencies, and percentages.
 4. **Drill Down**: Go to **Fund-wise Drilldown** (Tab 2) and click on any Mutual Fund row to toggle and expand the list of investors for that fund.
+
+---
+
+## Output Screens
+
+### 1. Investor-wise Purchase Summary per Mutual Fund (Tab 1)
+![Investor Purchase Summary](assets/1.png)
+
+### 2. Mutual Fund-wise Summary per Investor (Tab 2)
+![Fund-wise Summary per Investor](assets/2.png)
+
+### 3. Investor List with Purchase Details (Tab 3)
+![Investor List with Purchase Details](assets/3.png)
+
+### 4. Mutual Fund Summary (Tab 4)
+![Mutual Fund Summary](assets/4.png)
+
